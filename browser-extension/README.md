@@ -1,4 +1,4 @@
-EveryLock Browser Extension
+# EveryLock Browser Extension
 
 계정 잠금 기능이 오히려 서비스 가용성에 문제를 일으킬 수 있지 않을까 싶어서 만들어본 크롬 확장 프로그램임.
 
