@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="격리된 로컬 환경에서 계정 잠금 가용성을 연구하는 교육용 시뮬레이터">
+  <title>EveryLock — 계정 잠금 보안 연구</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">PROJECT EVERYLOCK // LOCAL RESEARCH NODE</p>
+      <h1>Account Lockout <span>Security Research</span></h1>
+      <p class="subtitle">CWE-645 · 계정 잠금 정책의 서비스 가용성 영향 시뮬레이션</p>
+    </div>
+    <div class="status-wrap"><i id="statusDot"></i><span id="stateLabel">대기</span><small>127.0.0.1 ONLY</small></div>
+  </header>
+
+  <main>
+    <section class="warning">교육 및 방어 연구 전용 · 외부 요청 없음 · 모든 계정과 이벤트는 가상 데이터입니다.</section>
+
+    <section class="control-panel panel">
+      <div class="panel-head"><h2>실험 제어</h2><span>CONFIGURATION</span></div>
+      <div class="controls">
+        <label>가상 사용자<input id="userCount" type="number" min="100" max="10000" value="1000"></label>
+        <label>실패 이벤트<input id="failureEvents" type="number" min="1" max="1000000" value="10000"></label>
+        <label>잠금 임계값<input id="threshold" type="number" min="1" max="100" value="10"></label>
+        <label>초당 이벤트<input id="speed" type="number" min="1" max="10000" value="100"></label>
+        <label>랜덤 시드<input id="seed" type="number" min="0" value="2026"></label>
+      </div>
+      <div class="actions">
+        <button id="startBtn" class="primary">▶ 시작</button>
+        <button id="pauseBtn">Ⅱ 일시정지</button>
+        <button id="resetBtn">↺ 초기화</button>
+        <button id="stepBtn">+ 1회 실행</button>
+        <a href="/api/export/csv" download>CSV 내보내기</a>
+        <a href="/api/export/json" download>JSON 내보내기</a>
+      </div>
+      <div class="progress"><span id="progressBar"></span></div>
+      <p id="progressText">0 / 10,000 이벤트</p>
+    </section>
+
+    <section class="policy-tabs" role="tablist" aria-label="정책 선택">
+      <button class="tab active" data-policy="A">POLICY A <small>하드 잠금</small></button>
+      <button class="tab" data-policy="B">POLICY B <small>적응형 방어</small></button>
+    </section>
+
+    <section class="metrics" aria-label="핵심 지표">
+      <article><span>TOTAL ACCOUNTS</span><strong id="totalValue">1,000</strong><small>가상 계정</small></article>
+      <article><span>ACTIVE ACCOUNTS</span><strong id="activeValue" class="green">1,000</strong><small>서비스 이용 가능</small></article>
+      <article><span>LOCKED ACCOUNTS</span><strong id="lockedValue" class="red">0</strong><small>관리자 복구 필요</small></article>
+      <article><span>AVAILABILITY RATE</span><strong id="availabilityValue" class="cyan">100.00%</strong><small>활성 / 전체</small></article>
+    </section>
+
+    <section class="workspace-grid">
+      <article class="panel account-panel">
+        <div class="panel-head"><h2>가상 계정 상태</h2><span id="accountHint">최대 500개 표시</span></div>
+        <div class="legend"><i class="active-dot"></i> 정상 <i class="locked-dot"></i> 잠금 <i class="verify-dot"></i> 추가 인증</div>
+        <div id="accountGrid" class="account-grid" aria-label="가상 계정 상태 그리드"></div>
+      </article>
+      <article class="panel log-panel">
+        <div class="panel-head"><h2>이벤트 로그</h2><span>LIVE STREAM</span></div>
+        <div id="eventLog" class="event-log" aria-live="polite"></div>
+      </article>
+    </section>
+
+    <section class="charts">
+      <article class="panel"><div class="panel-head"><h2>시간에 따른 잠긴 계정</h2><span>A vs B</span></div><canvas id="lockChart"></canvas></article>
+      <article class="panel"><div class="panel-head"><h2>활성 / 잠금 비율</h2><span id="ratioPolicy">POLICY A</span></div><canvas id="ratioChart"></canvas></article>
+      <article class="panel"><div class="panel-head"><h2>인증 실패 누적 추이</h2><span>EVENTS</span></div><canvas id="eventChart"></canvas></article>
+    </section>
+
+    <section class="panel comparison">
+      <div class="panel-head"><h2>방어 정책 비교</h2><span>OBJECTIVE COMPARISON</span></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>측정 항목</th><th>Policy A — 하드 잠금</th><th>Policy B — 적응형</th></tr></thead>
+        <tbody>
+          <tr><td>잠긴 계정</td><td id="aLocked">0</td><td id="bLocked">0</td></tr>
+          <tr><td>정상 사용자 차단 대용 지표*</td><td id="aDenied">0</td><td id="bDenied">0</td></tr>
+          <tr><td>서비스 가용성</td><td id="aAvailable">100%</td><td id="bAvailable">100%</td></tr>
+          <tr><td>지연 처리</td><td>0</td><td id="bDelayed">0</td></tr>
+          <tr><td>추가 인증 요구</td><td>0</td><td id="bVerify">0</td></tr>
+        </tbody>
+      </table></div>
+      <p class="footnote">* 실패 이벤트가 공격인지 정상 사용자의 실수인지 구분하지 않는 보수적 대용 지표입니다. Policy B도 지연과 추가 인증이라는 비용이 있습니다.</p>
+    </section>
+
+    <footer>본 결과는 격리된 가상 환경에서 수행한 시뮬레이션이며, 실제 운영 시스템의 대규모 공격 가능성을 입증하지 않는다.</footer>
+  </main>
+  <script src="/static/vendor/chart.umd.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

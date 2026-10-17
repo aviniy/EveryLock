@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ko-KR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="cache-control" content="no-cache">
+  <title>포털시스템 · 로컬 보안 실습</title>
+  <link rel="stylesheet" href="/cju/css/portal-lab.css">
+  <script src="/cju/js/jquery-1.12.1.js"></script>
+</head>
+<body>
+  <div class="lab-banner">
+    <div><strong>LOCAL SECURITY LAB</strong><span>청주대학교 포털 공개 화면 기반 모의훈련 · 실제 로그인 불가 · 외부 전송 없음</span></div>
+    <div class="mode-switch" role="group" aria-label="서버 구현 모드">
+      <button id="mode-vulnerable" class="active" type="button">취약 모드</button>
+      <button id="mode-secure" type="button">방어 모드</button>
+      <button id="open-lockout" class="lockout-button" type="button">계정 잠금 실험</button>
+      <a class="admin-link tool-link" href="/tool" target="_blank" rel="noopener">Attack Tool</a>
+      <button id="open-console" class="console-button" type="button">분석 콘솔</button>
+      <a class="admin-link" href="/admin" target="_blank" rel="noopener">관리자</a>
+    </div>
+  </div>
+
+  <div class="login_wrap">
+    <div class="wrap">
+      <main class="login" aria-label="청주대학교 포털 로컬 복제 화면">
+        <div class="login_header">
+          <img src="/cju/img/login_logo.png" alt="청주대학교">
+          <span class="lab-watermark">LOCAL LAB</span>
+        </div>
+
+        <section class="login_left">
+          <div class="tit">로그인<span>Login</span></div>
+          <div class="tab"><ul><li class="on" data-tab="idLogin">ID / PW 로그인</li><li data-tab="certLogin">보안인증서 로그인</li></ul></div>
+          <div class="div_con id_info" id="idLogin">
+            <form id="LoginForm" autocomplete="off">
+              <div>
+                <p><label for="newUserId">ID</label><input type="text" id="newUserId" name="userId" placeholder="아이디(학생은 ID/PW 로그인)"></p>
+                <p><label for="newPassword">PW</label><input type="password" id="newPassword" name="password" placeholder="초기비밀번호(생년월일 8자리, YYYYMMDD)" autocomplete="off"></p>
+              </div>
+              <div class="id_save">
+                <input type="checkbox" id="saveLoginID"><label for="saveLoginID">아이디저장</label>
+                <ul class="id_search"><li><a href="#" data-local-dialog="아이디찾기">아이디찾기</a></li><li><a href="#" data-local-dialog="비밀번호재설정">비밀번호재설정</a></li></ul>
+              </div>
+              <button class="btn_cus2" id="portal-login" type="submit">로그인</button>
+              <button class="btn_cus1" id="fill-sqli" type="button">SQL 인젝션 실습값 넣기</button>
+            </form>
+          </div>
+          <div class="div_con hidden" id="certLogin">
+            <div class="text_wrap">보안인증서 로그인을 이용할 경우,<br><span>개인당 1개의 인증서 등록</span>이 필요합니다.<br><b>로컬 실습에서는 인증서 기능이 비활성화됩니다.</b></div>
+            <button class="btn_cus2 local-disabled" type="button">보안인증서 로그인</button>
+            <button class="btn_cus1 local-disabled" type="button">보안인증서 등록</button>
+            <button class="btn_cus1 local-disabled" type="button">보안인증서 신청</button>
+            <button class="btn_cus1 local-disabled" type="button">보안인증센터</button>
+          </div>
+        </section>
+
+        <section class="login_right">
+          <div class="tit">학사일정<span>Academic Calendar</span></div>
+          <ul id="ScheduleArea">
+            <li><span>2학기 중간고사</span><span class="day">2026.10.19 ~ 2026.10.23</span></li>
+            <li><span>수업일수 3/4선</span><span class="day">2026.11.12</span></li>
+            <li><span>동계 계절학기 수강신청</span><span class="day">2026.11.23 ~ 2026.11.27</span></li>
+            <li><span>2학기 기말고사</span><span class="day">2026.12.14 ~ 2026.12.18</span></li>
+            <li><span>동계방학 시작</span><span class="day">2026.12.21</span></li>
+          </ul>
+          <div class="schedule-note">표시된 일정은 실습용 예시입니다.</div>
+        </section>
+
+        <nav class="login_link" aria-label="포털 바로가기">
+          <a href="#" class="semester" data-local-dialog="수강신청">수강신청</a>
+          <a href="#" class="help" data-local-dialog="도움말">도움말</a>
+          <a href="#" class="remote" data-local-dialog="원격지원">원격지원</a>
+          <a href="#" class="parent" id="open-parent">학부모 간편조회</a>
+          <a href="#" class="person_num" data-local-dialog="학번조회">학번조회</a>
+        </nav>
+      </main>
+    </div>
+  </div>
+
+  <aside id="analysis-console" class="analysis-console" aria-label="보안 분석 콘솔">
+    <header><div><strong>보안 분석 콘솔</strong><span id="mode-label">취약 모드</span></div><button id="close-console" type="button" aria-label="닫기">×</button></header>
+    <div class="console-tabs"><button class="active" data-panel="console-result">실행 결과</button><button data-panel="lockout-panel">계정 잠금</button><button data-panel="xss-panel">XSS</button><button data-panel="session-panel">세션</button><button data-panel="error-panel">오류 노출</button></div>
+    <section id="console-result" class="console-panel active">
+      <div class="console-hint">로그인 또는 다른 실습 버튼을 누르면 요청·응답 비교가 표시됩니다.</div>
+      <pre id="lab-output">아직 실행된 시나리오가 없습니다.</pre>
+    </section>
+    <section id="lockout-panel" class="console-panel lockout-panel">
+      <p class="lockout-safe">localhost 내부 가상 계정만 변경합니다. 실제 포털 요청은 생성하지 않습니다.</p>
+      <div class="lockout-form">
+        <label>가상 계정 수<input id="lock-account-count" type="number" min="10" max="1000" value="100"></label>
+        <label>실패 이벤트 수<input id="lock-event-count" type="number" min="1" max="100000" value="1000"></label>
+        <label>분배 방식<select id="lock-distribution"><option value="spread">전체 계정 순환</option><option value="focused">단일 계정 집중</option></select></label>
+      </div>
+      <div class="button-row lockout-actions"><button id="lock-start" type="button">▶ 시뮬레이션</button><button id="lock-pause" type="button">Ⅱ 일시정지</button><button id="lock-reset" type="button">↺ 초기화</button></div>
+      <div class="lockout-metrics"><span>전체 <b id="lock-total">0</b></span><span>정상 <b id="lock-active">0</b></span><span>잠금 <b id="lock-locked">0</b></span><span>가용성 <b id="lock-availability">100%</b></span></div>
+      <div id="lock-grid" class="lock-grid" aria-label="가상 계정 상태"></div>
+      <pre id="lock-log">실행 전</pre>
+    </section>
+    <section id="xss-panel" class="console-panel">
+      <label for="profile-name">서버가 반환할 사용자 이름</label><input id="profile-name" value="김학생">
+      <div class="button-row"><button id="fill-xss" type="button">무해한 XSS 예시 채우기</button><button id="run-xss" type="button">현재 모드로 출력</button></div>
+      <div id="xss-flag">스크립트 실행 안 됨</div><div id="xss-output" class="render-box">사용자: 김학생</div>
+    </section>
+    <section id="session-panel" class="console-panel"><p>HttpOnly 쿠키와 JavaScript 변수를 비교합니다.</p><button id="run-session" type="button">세션 노출 확인</button><pre id="session-output">실행 전</pre></section>
+    <section id="error-panel" class="console-panel"><p>내부 예외를 그대로 반환하는 경우와 일반 오류 응답을 비교합니다.</p><button id="run-error" type="button">오류 응답 확인</button><pre id="error-output">실행 전</pre></section>
+  </aside>
+
+  <div id="local-dialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <div class="modal-bg"></div><div class="modal-card"><button class="modal-close" type="button" aria-label="닫기">×</button><h2 id="dialog-title">로컬 실습</h2><p id="dialog-message"></p><button class="btn_cus2 modal-ok" type="button">확인</button></div>
+  </div>
+  <div id="parent-dialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="parent-title">
+    <div class="modal-bg"></div><div class="modal-card parent-card"><button class="modal-close" type="button" aria-label="닫기">×</button><h2 id="parent-title">학부모 간편서비스 · 로컬 실습</h2><p>학부모 P100에게 허용된 학생은 20260001뿐입니다.</p><label for="child-id">조회할 학번</label><select id="child-id"><option value="20260001">20260001 - 허용된 자녀</option><option value="20260002">20260002 - 관계없는 학생</option></select><button id="run-idor" class="btn_cus2" type="button">현재 모드로 조회</button><pre id="idor-output">실행 전</pre></div>
+  </div>
+
+  <script>window.exposedSession = "__LAB_SESSION__";</script>
+  <script src="/cju/js/portal-lab.js"></script>
+</body>
+</html>

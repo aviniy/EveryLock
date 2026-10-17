@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "EveryLock Advanced Controller",
+  "version": "2.0",
+  "description": "다중 패널, 와일드카드 패턴 학번 생성 및 IndexedDB/JSON 기록을 지원하는 EveryLock 확장프로그램",
+  "permissions": ["scripting", "tabs"],
+  "host_permissions": ["http://127.0.0.1/*", "http://localhost/*"],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

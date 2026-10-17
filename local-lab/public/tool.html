@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko-KR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="127.0.0.1 전용 계정 잠금 가용성 연구 인터페이스">
+  <title>EveryLock · Local Attack Console</title>
+  <link rel="stylesheet" href="/cju/css/tool.css">
+</head>
+<body>
+  <div class="grid-bg" aria-hidden="true"></div>
+  <header class="tool-header">
+    <div class="brand"><span class="brand-mark">EL</span><div><p>PROJECT EVERYLOCK</p><h1>LOCAL ATTACK CONSOLE</h1></div></div>
+    <div class="target"><span class="pulse"></span><div><small>TARGET LOCKED</small><strong>127.0.0.1:4173</strong></div></div>
+    <nav><a href="/">PORTAL</a><a href="/admin">ADMIN</a></nav>
+  </header>
+
+  <main>
+    <section class="safety-strip"><b>ISOLATED MODE</b><span>LOOPBACK ONLY</span><span>NO EXTERNAL TRAFFIC</span><span>SYNTHETIC IDENTITIES</span></section>
+
+    <section class="config panel">
+      <div class="panel-title"><div><span>01</span><h2>SIMULATION PARAMETERS</h2></div><small>ACCOUNT LOCKOUT / CWE-645</small></div>
+      <div class="config-grid">
+        <label>TARGET ORIGIN<input value="http://127.0.0.1:4173" disabled></label>
+        <label>VIRTUAL STUDENTS<input id="users" type="number" min="10" max="1000" value="100"></label>
+        <label>ATTEMPTS / ACCOUNT<input id="attempts" type="number" min="1" max="10" value="10"></label>
+        <label>EVENTS / SECOND<input id="rate" type="number" min="1" max="100" value="40"></label>
+        <label>RANDOM SEED<input id="seed" type="number" value="2026"></label>
+        <label>ID RULE<input value="2026|2025|2024|2023 + 6 DIGITS" disabled></label>
+        <label>PASSWORD RULE<input value="[A-Za-z0-9] × 8 (NOT STORED)" disabled></label>
+      </div>
+      <div class="actions">
+        <button id="start" class="start" type="button"><span>▶</span> INITIALIZE & RUN</button>
+        <button id="pause" type="button">Ⅱ PAUSE</button>
+        <button id="resume" type="button">▶ RESUME</button>
+        <button id="reset" class="danger" type="button">↺ RESET LAB</button>
+      </div>
+      <div class="progress-track"><i id="progress-bar"></i></div>
+      <div class="progress-meta"><span id="progress-text">0 / 1,000 EVENTS</span><span id="run-state">STANDBY</span></div>
+    </section>
+
+    <section class="metrics">
+      <article><span>TOTAL ACCOUNTS</span><strong id="total">0</strong><small>GENERATED TARGETS</small></article>
+      <article><span>ACTIVE ACCOUNTS</span><strong id="active" class="green">0</strong><small>AVAILABLE</small></article>
+      <article><span>LOCKED ACCOUNTS</span><strong id="locked" class="red">0</strong><small>LOCK SUCCESS</small></article>
+      <article><span>AVAILABILITY</span><strong id="availability" class="cyan">100.00%</strong><small>SERVICE RATE</small></article>
+    </section>
+
+    <section class="account-map panel">
+      <div class="panel-title"><div><span>02</span><h2>ACCOUNT STATE MAP</h2></div><div class="legend"><i></i>ACTIVE <i class="locked-dot"></i>LOCKED</div></div>
+      <div id="account-grid" class="account-grid"></div>
+    </section>
+
+    <section class="main-grid">
+      <article class="terminal panel">
+        <div class="panel-title"><div><span>03</span><h2>LIVE ATTACK STREAM</h2></div><small id="stream-count">0 EVENTS</small></div>
+        <div class="terminal-head"><span>everylock@localhost:~$</span><button id="clear-log" type="button">CLEAR</button></div>
+        <div id="terminal-output" class="terminal-output" aria-live="polite"><p class="muted">[SYSTEM] Waiting for local simulation...</p></div>
+      </article>
+      <article class="locked-list panel">
+        <div class="panel-title"><div><span>04</span><h2>LOCKED STUDENT IDs</h2></div><small id="locked-count">0 FOUND</small></div>
+        <div class="list-head"><span>STUDENT ID</span><span>FAIL</span><span>LOCKED AT</span></div>
+        <div id="locked-rows" class="locked-rows"><p class="empty">NO LOCKED ACCOUNTS</p></div>
+      </article>
+    </section>
+  </main>
+
+  <footer>EVERYLOCK EDUCATIONAL LAB // ALL EVENTS ARE GENERATED INSIDE 127.0.0.1 // ACTUAL PORTAL TRAFFIC: 0</footer>
+  <script src="/cju/js/tool.js"></script>
+</body>
+</html>

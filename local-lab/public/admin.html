@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko-KR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>계정 잠금 관리자 · LOCAL LAB</title>
+  <link rel="stylesheet" href="/cju/css/portal-lab.css">
+  <link rel="stylesheet" href="/cju/css/admin.css">
+</head>
+<body class="admin-body">
+  <header class="admin-header"><div><strong>LOCAL LAB</strong><h1>계정 잠금 관리자</h1><p>격리된 가상 계정만 관리합니다.</p></div><a href="/">← 포털 화면</a></header>
+  <main class="admin-main">
+    <section class="admin-metrics">
+      <article><span>전체 계정</span><b id="admin-total">0</b></article>
+      <article><span>정상 계정</span><b id="admin-active">0</b></article>
+      <article><span>잠긴 계정</span><b id="admin-locked">0</b></article>
+      <article><span>가용성</span><b id="admin-availability">100%</b></article>
+    </section>
+    <section class="admin-card">
+      <div class="admin-toolbar"><div><h2>잠긴 계정</h2><p>사진에서 관찰된 관리자 해제 절차를 로컬 가상 데이터로 재현합니다.</p></div><button id="unlock-all" type="button">전체 잠금 해제</button></div>
+      <div class="admin-table-wrap"><table><thead><tr><th>가상 사용자 ID</th><th>실패 횟수</th><th>잠금 시각</th><th>상태</th><th>조치</th></tr></thead><tbody id="locked-rows"></tbody></table></div>
+      <p id="admin-empty" class="admin-empty">잠긴 가상 계정이 없습니다.</p>
+    </section>
+    <section class="admin-card"><h2>최근 복구 로그</h2><pre id="admin-log">로그 없음</pre></section>
+  </main>
+  <script src="/cju/js/admin.js"></script>
+</body>
+</html>

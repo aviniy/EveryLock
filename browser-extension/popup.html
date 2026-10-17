@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 400px;
+      padding: 10px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0b0f0c;
+      color: #d9eee0;
+      margin: 0;
+    }
+    .header-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #54f090;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #1f3b2a;
+      padding-bottom: 4px;
+    }
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #1f3b2a;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 6px;
+      background: #101d15;
+      color: #708f79;
+      border: 1px solid #1f3b2a;
+      border-bottom: none;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: bold;
+      border-radius: 4px 4px 0 0;
+    }
+    .tab-btn.active {
+      background: #183522;
+      color: #54f090;
+      border-color: #54f090;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .input-group {
+      margin-bottom: 8px;
+    }
+    label {
+      display: block;
+      font-size: 10px;
+      color: #708f79;
+      margin-bottom: 2px;
+    }
+    input, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px;
+      background: #030705;
+      border: 1px solid #1f3b2a;
+      color: #4ee8ff;
+      font-family: monospace;
+      font-size: 11px;
+      border-radius: 3px;
+    }
+    .row {
+      display: flex;
+      gap: 6px;
+    }
+    .col {
+      flex: 1;
+    }
+    .btn-group {
+      display: flex;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    button.action-btn {
+      flex: 1;
+      padding: 7px;
+      background: #101d15;
+      color: #54f090;
+      border: 1px solid #1f3b2a;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 10px;
+      border-radius: 3px;
+    }
+    button.action-btn:hover {
+      background: #183522;
+    }
+    button.btn-danger {
+      color: #ff5555;
+      border-color: #552222;
+    }
+    button.btn-warning {
+      color: #ffc85a;
+      border-color: #554411;
+    }
+    #log {
+      margin-top: 10px;
+      height: 110px;
+      background: #030604;
+      border: 1px solid #1f3b2a;
+      padding: 6px;
+      font-size: 9px;
+      color: #8db49a;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+    .db-list {
+      height: 130px;
+      overflow-y: auto;
+      background: #030604;
+      border: 1px solid #1f3b2a;
+      padding: 6px;
+      font-size: 10px;
+      color: #d9eee0;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-title">EVERYLOCK ADVANCED CONTROLLER</div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="tab-auto">⚡ 자동화 제어</button>
+    <button class="tab-btn" data-tab="tab-generator">🎲 패턴 생성기</button>
+    <button class="tab-btn" data-tab="tab-db">💾 DB / JSON 기록</button>
+  </div>
+
+  <!-- 패널 1: 자동화 제어 -->
+  <div id="tab-auto" class="tab-content active">
+    <div class="input-group">
+      <label>TARGET IDs (패턴 생성기에서 가져온 학번 리스트)</label>
+      <textarea id="targetIdsArea" rows="3" placeholder="패턴 생성기에서 '자동화에 적용'을 누르면 여기에 들어옵니다. 직접 입력도 가능 (줄바꿈 구분)"></textarea>
+    </div>
+
+    <div class="row">
+      <div class="col input-group">
+        <label>ATTEMPTS / 계정당 시도 횟수</label>
+        <input type="number" id="maxAttempts" value="10">
+      </div>
+      <div class="col input-group">
+        <label>DELAY (ms)</label>
+        <input type="number" id="delayMs" value="500">
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button id="btnStart" class="action-btn">▶ 전체 실행</button>
+      <button id="btnPause" class="action-btn btn-warning">⏸ 일시정지</button>
+      <button id="btnResume" class="action-btn">⏯ 재시작</button>
+      <button id="btnStop" class="action-btn btn-danger">⏹ 중단</button>
+    </div>
+  </div>
+
+  <!-- 패널 2: 패턴 생성기 -->
+  <div id="tab-generator" class="tab-content">
+    <div class="input-group">
+      <label>PATTERN (예: 2023------, 2023011---)</label>
+      <input type="text" id="patternInput" value="2023011---">
+    </div>
+    <div class="input-group">
+      <label>GENERATE COUNT (생성 개수)</label>
+      <input type="number" id="genCount" value="5">
+    </div>
+    <div class="btn-group">
+      <button id="btnGeneratePattern" class="action-btn">🎲 랜덤 학번 생성</button>
+      <button id="btnApplyPattern" class="action-btn" style="color:#ffc85a;">⚡ 자동화에 적용</button>
+    </div>
+
+    <div class="input-group" style="margin-top: 6px;">
+      <label>GENERATED LIST</label>
+      <textarea id="generatedArea" rows="3" readonly></textarea>
+    </div>
+  </div>
+
+  <!-- 패널 3: DB / JSON 기록 -->
+  <div id="tab-db" class="tab-content">
+    <label>LOCKED ACCOUNTS (잠김 감지된 계정 DB)</label>
+    <div id="dbList" class="db-list">기록 없음</div>
+
+    <div class="btn-group">
+      <button id="btnExportJson" class="action-btn">📥 locked.json 내보내기</button>
+      <button id="btnClearDb" class="action-btn btn-danger">🗑 DB 전체 삭제</button>
+    </div>
+  </div>
+
+  <div id="log">Ready...</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

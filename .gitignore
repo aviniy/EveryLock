@@ -1,0 +1,12 @@
+__pycache__/
+.pytest_cache/
+.venv/
+*.py[cod]
+*.exe
+local-lab/.pyinstaller/
+local-lab/release/
+everylock/reports/*.csv
+everylock/reports/*.json
+!everylock/reports/.gitkeep
+.idea/
+.vscode/
