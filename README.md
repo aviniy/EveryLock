@@ -46,3 +46,5 @@ node server.mjs
 - 스크린샷과 보고서에는 학번, 비밀번호, 쿠키, 세션 값 등 개인정보를 포함하지 않는다.
 
 > 본 결과는 격리된 가상 환경에서 수행한 시뮬레이션이며, 실제 운영 시스템의 대규모 공격 가능성을 입증하지 않는다.
+
+노션 포트폴리오: https://app.notion.com/p/aviniy/EveryLock-Project-3fc5747616b28166b6c8d93de1ddb2b2?source=copy_link
