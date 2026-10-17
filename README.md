@@ -1,6 +1,6 @@
 # EveryLock
 
-EveryLock은 계정 잠금 정책이 정상 사용자 가용성에 미치는 영향을 연구하기 위한 **localhost 전용 교육용 시뮬레이터**다. 실제 계정이나 외부 인증 서버를 대상으로 하지 않으며, 모든 계정과 이벤트는 합성 데이터다.
+EveryLock은 계정 잠금 정책이 정상 사용자 가용성에 미치는 영향을 연구하기 위한 **로컬 전용 교육용 시뮬레이터**다. 실제 계정이나 외부 인증 서버를 대상으로 하지 않으며, 모든 계정과 이벤트는 합성 데이터다.
 
 ## 연구 배경
 
@@ -12,7 +12,7 @@ EveryLock은 계정 잠금 정책이 정상 사용자 가용성에 미치는 영
 
 - `everylock/`: FastAPI 기반 정책 A/B 비교 대시보드와 CSV/JSON 보고서
 - `local-lab/`: Node.js 기반 가상 포털, 관리자 화면, 테스트 도구
-- `browser-extension/`: loopback에서만 동작하도록 제한한 실습 UI
+- `browser-extension/`: Everylock Attack 크롬 확장 버전
 - `SECURITY.md`: 사용 범위와 제보 원칙
 
 ## 실행
