@@ -1,0 +1,132 @@
+body {
+  width: 420px;
+  padding: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #0b0f0c;
+  color: #d9eee0;
+  margin: 0;
+}
+.header-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #54f090;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #1f3b2a;
+  padding-bottom: 4px;
+}
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #1f3b2a;
+}
+.tab-btn {
+  flex: 1;
+  padding: 6px;
+  background: #101d15;
+  color: #708f79;
+  border: 1px solid #1f3b2a;
+  border-bottom: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 4px 4px 0 0;
+}
+.tab-btn.active {
+  background: #183522;
+  color: #54f090;
+  border-color: #54f090;
+}
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+.input-group {
+  margin-bottom: 8px;
+}
+label {
+  display: block;
+  font-size: 10px;
+  color: #708f79;
+  margin-bottom: 2px;
+}
+input, textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px;
+  background: #030705;
+  border: 1px solid #1f3b2a;
+  color: #4ee8ff;
+  font-family: monospace;
+  font-size: 11px;
+  border-radius: 3px;
+}
+.row {
+  display: flex;
+  gap: 6px;
+}
+.col {
+  flex: 1;
+}
+.btn-group {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+}
+button.action-btn {
+  flex: 1;
+  padding: 7px;
+  background: #101d15;
+  color: #54f090;
+  border: 1px solid #1f3b2a;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 10px;
+  border-radius: 3px;
+}
+button.action-btn:hover {
+  background: #183522;
+}
+button.btn-danger {
+  color: #ff5555;
+  border-color: #552222;
+}
+
+/* 실시간 로그 시스템 스타일 */
+#log {
+  margin-top: 10px;
+  height: 110px;
+  background: #030604;
+  border: 1px solid #1f3b2a;
+  padding: 6px;
+  font-size: 9px;
+  overflow-y: auto;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.log-item {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.log-info { color: #8db49a; }
+.log-warn { color: #ffc85a; }
+.log-error { color: #ff5555; }
+.log-success { color: #54f090; }
+
+.db-list {
+  height: 110px;
+  overflow-y: auto;
+  background: #030604;
+  border: 1px solid #1f3b2a;
+  padding: 6px;
+  font-size: 10px;
+  color: #d9eee0;
+  margin-bottom: 6px;
+}
+.search-box {
+  margin-bottom: 6px;
+}

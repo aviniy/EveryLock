@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "EveryLock Advanced Controller",
+  "version": "4.2.1",
+  "description": "Side Panel 및 영구 로그/입력값 복원이 지원되는 EveryLock 시뮬레이터",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs",
+    "storage",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://portal.cju.ac.kr/*"
+  ],
+  "background": {
+    "service_worker": "background/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  }
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header-title">EVERYLOCK V4.2 CONTROL TOWER</div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="tab-auto">⚡ 화력 제어</button>
+    <button class="tab-btn" data-tab="tab-generator">🎲 패턴 생성기</button>
+    <button class="tab-btn" data-tab="tab-db">💾 DB / 기록</button>
+  </div>
+
+  <div id="tab-auto" class="tab-content active">
+    <div class="input-group">
+      <label>TARGET IDs (학번 리스트)</label>
+      <textarea id="targetIdsArea" rows="2" placeholder="패턴 생성기에서 가져오거나 직접 입력" data-persist="true"></textarea>
+    </div>
+
+    <div class="row">
+      <div class="col input-group">
+        <label>시도 횟수 (1~100)</label>
+        <input type="number" id="maxAttempts" value="15" min="1" max="100" data-persist="true">
+      </div>
+      <div class="col input-group">
+        <label>병렬 탭 (1~10)</label>
+        <input type="number" id="concurrencyTabs" value="3" min="1" max="10" data-persist="true">
+      </div>
+      <div class="col input-group">
+        <label>요청 간격 (ms, 0~5000)</label>
+        <input type="number" id="requestDelay" value="200" min="0" max="5000" data-persist="true">
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button id="btnStart" class="action-btn">▶ 멀티탭 시작</button>
+      <button id="btnStop" class="action-btn btn-danger">⏹ 전체 중단</button>
+    </div>
+  </div>
+
+  <div id="tab-generator" class="tab-content">
+    <div class="input-group">
+      <label>PATTERN (예: 2023------, 2023011---)</label>
+      <input type="text" id="patternInput" value="2023011---" data-persist="true">
+    </div>
+    <div class="input-group">
+      <label>GENERATE COUNT (1~1000)</label>
+      <input type="number" id="genCount" value="10" min="1" max="1000" data-persist="true">
+    </div>
+    <div class="btn-group">
+      <button id="btnGeneratePattern" class="action-btn">🎲 랜덤 학번 생성</button>
+      <button id="btnApplyPattern" class="action-btn" style="color:#ffc85a;">⚡ 화력창에 적용</button>
+    </div>
+
+    <div class="input-group" style="margin-top: 6px;">
+      <label>GENERATED LIST</label>
+      <textarea id="generatedArea" rows="2" readonly data-persist="true"></textarea>
+    </div>
+  </div>
+
+  <div id="tab-db" class="tab-content">
+    <div class="search-box">
+      <input type="text" id="dbSearchInput" placeholder="🔍 학번 검색...">
+    </div>
+    <label>LOCKED ACCOUNTS (잠김 감지된 계정 DB)</label>
+    <div id="dbList" class="db-list">기록 없음</div>
+
+    <div class="btn-group">
+      <button id="btnExportJson" class="action-btn">📥 locked.json 내보내기</button>
+      <button id="btnClearDb" class="action-btn btn-danger">🗑 DB 전체 삭제</button>
+    </div>
+  </div>
+
+  <!-- 하단 실시간 로그 시스템 영역 -->
+  <div id="log"></div>
+
+  <script type="module" src="js/popup.js"></script>
+</body>
+</html>
